@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>🛒 Lista de Compras PRO</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* VARIÁVEIS DE CORES - SISTEMA DE TEMAS */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #d9e6f5 0%, #cbdde9 100%);
+      --container-bg: rgba(245, 248, 250, 0.92);
+      --text-main: #0b3b5f;
+      --text-sub: #2c5a6e;
+      --card-bg: #ffffffdb;
+      --input-bg: #ffffffcc;
+      --border-color: #bdd4e2;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --item-category-bg: #d4e3ef;
+      --accent: #3b82f6;
+    }
+
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --container-bg: rgba(30, 41, 59, 0.96);
+      --text-main: #f1f5f9;
+      --text-sub: #94a3b8;
+      --card-bg: #1e293b;
+      --input-bg: #334155;
+      --border-color: #475569;
+      --shadow: rgba(0, 0, 0, 0.4);
+      --item-category-bg: #475569;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      padding: 30px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-main);
+    }
+
+    .theme-switch {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      z-index: 1000;
+    }
+
+    .glass-container {
+      max-width: 800px;
+      width: 100%;
+      background: var(--container-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 28px 24px 36px;
+      box-shadow: 0 20px 40px var(--shadow);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .sub {
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+      display: block;
+    }
+
+    .group-box {
+      background: var(--input-bg);
+      border-radius: 20px;
+      padding: 8px 15px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 1rem;
+      padding: 10px;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    button {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button:active { transform: scale(0.95); }
+
+    /* LISTA DE ITENS */
+    .lista-items {
+      list-style: none;
+      margin: 20px 0;
+      max-height: 450px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .lista-items li {
+      background: var(--card-bg);
+      margin-bottom: 15px;
+      padding: 20px;
+      border-radius: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 10px var(--shadow);
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .item-nome { font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 5px; }
+
+    .item-categoria {
+      font-size: 0.7rem;
+      background: var(--item-category-bg);
+      padding: 3px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .item-preco { 
+      font-weight: 800; 
+      background: #22c55e20; 
+      color: #22c55e;
+      padding: 6px 12px; 
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .checked { border-left: 8px solid #22c55e !important; }
+    .checked .item-nome { text-decoration: line-through; opacity: 0.6; }
+
+    .item-actions { 
+      display: flex; 
+      gap: 10px; 
+      justify-content: flex-end;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+    }
+
+    .btn-check { background: #dcfce7; color: #15803d; flex: 1; justify-content: center;}
+    .btn-price { background: #e0f2fe; color: #0369a1; }
+    .btn-delete { background: #fee2e2; color: #b91c1c; }
+
+    /* MODAL PROFISSIONAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-content h3 { margin-bottom: 15px; color: var(--text-main); }
+    
+    .modal-msg { color: var(--text-sub); margin-bottom: 20px; font-size: 1rem; line-height: 1.4; }
+
+    .modal-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 15px;
+      padding: 12px;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .modal-buttons { display: flex; gap: 10px; }
+    .modal-buttons button { flex: 1; justify-content: center; }
+
+    .total-area {
+      background: var(--card-bg);
+      border-radius: 25px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .total-box { font-size: 1.5rem; font-weight: 800; color: #22c55e; }
+  </style>
+</head>
+<body>
+
+<button class="theme-switch" onclick="toggleTheme()" id="themeBtn">
+  <i class="fas fa-moon"></i>
+</button>
+
+<div class="modal-overlay" id="customModal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Título</h3>
+    <p id="modalMessage" class="modal-msg"></p>
+    <input type="number" id="modalInput" class="modal-input" placeholder="0,00" step="0.01" style="display: none;">
+    <div class="modal-buttons" id="modalButtons">
+      </div>
+  </div>
+</div>
+
+<div class="glass-container">
+  <h1>
+    <i class="fas fa-cart-shopping"></i> 
+    Lista de Compras PRO
+    <i class="fas fa-crown" style="color: #f5a623;"></i>
+  </h1>
+  <span class="sub">✨ visual moderno · tema inteligente ✨</span>
+
+  <div class="group-box">
+    <input type="text" id="novaLista" placeholder="Nome da lista (ex: Feira)..." autocomplete="off">
+    <button onclick="criarLista()" style="background: #2c9e6e; color: white;">
+      <i class="fas fa-folder-plus"></i> Criar
+    </button>
+  </div>
+
+  <div class="group-box">
+    <label style="font-weight: 600; font-size: 0.9rem;">Ativa:</label>
+    <select id="listas" onchange="trocarLista()"></select>
+    <button onclick="confirmarDeletarLista()" style="background: #fee2e2; color: #b91c1c; padding: 10px;" title="Apagar Lista Ativa">
+      <i class="fas fa-trash-can"></i>
+    </button>
+  </div>
+
+  <div class="group-box">
+    <input type="text" id="produto" placeholder="O que vai comprar?" autocomplete="off">
+    <select id="categoria">
+      <option value="Mercado">🛒 Mercado</option>
+      <option value="Farmácia">💊 Farmácia</option>
+      <option value="Hortifruti">🥑 Hortifruti</option>
+      <option value="Limpeza">🧼 Limpeza</option>
+      <option value="Outros">✨ Outros</option>
+    </select>
+    <button onclick="adicionar()" style="background: #3b82f6; color: white;">
+      <i class="fas fa-plus-circle"></i> Adicionar
+    </button>
+  </div>
+
+  <ul id="lista" class="lista-items"></ul>
+
+  <div class="total-area">
+    <span style="font-weight: 700;"><i class="fas fa-coins"></i> Total Pago:</span>
+    <div class="total-box">R$ <span id="total">0,00</span></div>
+    <button onclick="confirmarLimparItens()" style="background: #fee2e2; color: #b91c1c;">
+      <i class="fas fa-broom"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+  let banco = JSON.parse(localStorage.getItem('bancoListas')) || {};
+  let listaAtual = localStorage.getItem('listaAtual') || null;
+  let acaoConfirmada = null;
+
+  function salvar() {
+    localStorage.setItem('bancoListas', JSON.stringify(banco));
+    localStorage.setItem('listaAtual', listaAtual);
+  }
+
+  // GERENCIAMENTO DO MODAL CUSTOMIZADO
+  function mostrarModal(config) {
+    const m = document.getElementById('customModal');
+    const input = document.getElementById('modalInput');
+    const btnArea = document.getElementById('modalButtons');
+    
+    document.getElementById('modalTitle').innerText = config.titulo;
+    document.getElementById('modalMessage').innerText = config.mensagem || "";
+    
+    input.style.display = config.comInput ? "block" : "none";
+    if(config.comInput) input.value = config.valorPadrao || "";
+
+    btnArea.innerHTML = "";
+    
+    if(config.tipo === "alerta") {
+      btnArea.innerHTML = `<button onclick="fecharModal()" style="background: var(--accent); color: white;">Entendido</button>`;
+    } else {
+      btnArea.innerHTML = `
+        <button onclick="fecharModal()" style="background: #ccc; color: #333;">Cancelar</button>
+        <button id="btnConfirmar" style="background: ${config.corConfirmar || 'var(--accent)'}; color: white;">Confirmar</button>
+      `;
+      document.getElementById('btnConfirmar').onclick = () => {
+        config.callback(input.value);
+        fecharModal();
+      };
+    }
+    
+    m.style.display = 'flex';
+  }
+
+  function fecharModal() { document.getElementById('customModal').style.display = 'none'; }
+
+  // FUNÇÕES DA LISTA
+  function criarLista() {
+    const input = document.getElementById('novaLista');
+    const nome = input.value.trim();
+    if (!nome || banco[nome]) {
+      mostrarModal({ titulo: "Ops!", mensagem: "Nome inválido ou a lista já existe!", tipo: "alerta" });
+      return;
+    }
+    banco[nome] = [];
+    listaAtual = nome;
+    input.value = '';
+    salvar();
+    atualizarSelect();
+    atualizar();
+  }
+
+  function confirmarDeletarLista() {
+    if (!listaAtual) return;
+    mostrarModal({
+      titulo: "Apagar Lista?",
+      mensagem: `Tem certeza que deseja apagar a lista "${listaAtual}" permanentemente?`,
+      corConfirmar: "#b91c1c",
+      callback: () => {
+        delete banco[listaAtual];
+        const chaves = Object.keys(banco);
+        listaAtual = chaves.length > 0 ? chaves[0] : null;
+        salvar();
+        atualizarSelect();
+        atualizar();
+      }
+    });
+  }
+
+  function adicionar() {
+    const prodInput = document.getElementById('produto');
+    const nome = prodInput.value.trim();
+    const cat = document.getElementById('categoria').value;
+    if (!listaAtual || !nome) {
+      mostrarModal({ titulo: "Atenção", mensagem: "Crie uma lista e dê nome ao produto!", tipo: "alerta" });
+      return;
+    }
+    banco[listaAtual].push({ nome, categoria: cat, preco: null, comprado: false });
+    prodInput.value = '';
+    atualizar();
+  }
+
+  function confirmarLimparItens() {
+    if (!listaAtual) return;
+    mostrarModal({
+      titulo: "Limpar Tudo?",
+      mensagem: "Deseja remover todos os produtos desta lista?",
+      corConfirmar: "#b91c1c",
+      callback: () => {
+        banco[listaAtual] = [];
+        atualizar();
+      }
+    });
+  }
+
+  function removerItem(i) {
+    mostrarModal({
+      titulo: "Remover Item?",
+      mensagem: `Deseja tirar "${banco[listaAtual][i].nome}" da lista?`,
+      corConfirmar: "#b91c1c",
+      callback: () => {
+        banco[listaAtual].splice(i, 1);
+        atualizar();
+      }
+    });
+  }
+
+  function definirPreco(i) {
+    mostrarModal({
+      titulo: "Definir Preço",
+      mensagem: `Quanto custou ${banco[listaAtual][i].nome}?`,
+      comInput: true,
+      valorPadrao: banco[listaAtual][i].preco || "",
+      callback: (valor) => {
+        if(valor !== "") {
+          banco[listaAtual][i].preco = parseFloat(valor);
+          atualizar();
+        }
+      }
+    });
+  }
+
+  // ATUALIZAÇÃO E TEMA (MANTIDOS)
+  function atualizar() {
+    const ul = document.getElementById('lista');
+    ul.innerHTML = '';
+    let total = 0;
+    if (!listaAtual || !banco[listaAtual]) return;
+
+    banco[listaAtual].forEach((item, i) => {
+      const li = document.createElement('li');
+      if (item.comprado) li.className = 'checked';
+      const precoTxt = item.preco ? `R$ ${item.preco.toFixed(2)}` : "R$ --";
+      
+      li.innerHTML = `
+        <div class="item-header">
+          <div class="item-info">
+            <strong class="item-nome">${item.nome}</strong>
+            <span class="item-categoria">${item.categoria}</span>
+          </div>
+          <div class="item-preco">${precoTxt}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-check" onclick="toggle(${i})">
+            <i class="fas ${item.comprado ? 'fa-undo' : 'fa-check'}"></i> ${item.comprado ? 'Desfazer' : 'Confirmar'}
+          </button>
+          <button class="btn-price" onclick="definirPreco(${i})"><i class="fas fa-tag"></i></button>
+          <button class="btn-delete" onclick="removerItem(${i})"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      ul.appendChild(li);
+      if (item.comprado && item.preco) total += item.preco;
+    });
+    document.getElementById('total').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    salvar();
+  }
+
+  function toggle(i) { banco[listaAtual][i].comprado = !banco[listaAtual][i].comprado; atualizar(); }
+
+  function atualizarSelect() {
+    const select = document.getElementById('listas');
+    select.innerHTML = '';
+    const nomes = Object.keys(banco);
+    if (nomes.length === 0) {
+      select.innerHTML = '<option disabled selected>Nenhuma lista</option>';
+      return;
+    }
+    nomes.forEach(nome => {
+      const opt = document.createElement('option');
+      opt.value = nome; opt.textContent = nome;
+      if (nome === listaAtual) opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
+
+  function trocarLista() { listaAtual = document.getElementById('listas').value; salvar(); atualizar(); }
+
+  function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+    document.getElementById('themeBtn').innerHTML = isDark ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+    localStorage.setItem('tema', isDark ? 'light' : 'dark');
+  }
+
+  if (localStorage.getItem('tema') === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>';
+  }
+
+  atualizarSelect();
+  atualizar();
+</script>
+</body>
+</html>
