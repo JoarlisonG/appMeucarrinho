@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>🛒 Meu Carrinho PRO</title>
+  <title>🛒 Meu Carrinho PRO - Otimizado</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* VARIÁVEIS DE CORES - SISTEMA DE TEMAS */
     :root {
       --bg-gradient: linear-gradient(135deg, #d9e6f5 0%, #cbdde9 100%);
       --container-bg: rgba(245, 248, 250, 0.92);
@@ -16,7 +17,9 @@
       --border-color: #bdd4e2;
       --shadow: rgba(0, 0, 0, 0.1);
       --item-category-bg: #d4e3ef;
+      --accent: #3b82f6;
     }
+
     [data-theme="dark"] {
       --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       --container-bg: rgba(30, 41, 59, 0.96);
@@ -29,32 +32,94 @@
       --item-category-bg: #475569;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; transition: background 0.3s ease, color 0.3s ease; }
-    
-    body { background: var(--bg-gradient); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; color: var(--text-main); }
-    
-    .theme-switch { position: fixed; top: 20px; right: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; box-shadow: 0 4px 10px var(--shadow); }
-    
-    .glass-container { max-width: 600px; width: 100%; background: var(--container-bg); backdrop-filter: blur(12px); border-radius: 40px; padding: 30px 25px; box-shadow: 0 20px 40px var(--shadow); }
-    
-    h1 { font-size: 1.8rem; text-align: center; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .sub { text-align: center; color: var(--text-sub); font-size: 0.85rem; margin-bottom: 35px; display: block; opacity: 0.8; }
-    
-    /* Espaçamento entre grupos de input */
-    .group-box { 
-      background: var(--input-bg); 
-      border-radius: 25px; 
-      padding: 12px 18px; 
-      margin-bottom: 20px; /* Mais espaço entre as seções */
-      border: 1px solid var(--border-color); 
-      display: flex; 
-      gap: 10px; 
-      align-items: center; 
-      flex-wrap: wrap; 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
     }
-    
-    input, select { background: transparent; border: none; outline: none; color: var(--text-main); font-size: 1rem; padding: 10px; flex: 1; min-width: 80px; }
-    
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      padding: 30px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-main);
+    }
+
+    .theme-switch {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      z-index: 1000;
+    }
+
+    .glass-container {
+      max-width: 800px;
+      width: 100%;
+      background: var(--container-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 28px 24px 36px;
+      box-shadow: 0 20px 40px var(--shadow);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .sub {
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      margin-bottom: 28px;
+      display: block;
+    }
+
+    .group-box {
+      background: var(--input-bg);
+      border-radius: 20px;
+      padding: 8px 15px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 1rem;
+      padding: 10px;
+      flex: 1;
+      min-width: 120px;
+    }
+
     .qtd-container {
       display: flex;
       align-items: center;
@@ -70,48 +135,163 @@
     #qtd { max-width: 60px; border: none !important; text-align: center; font-weight: 800; padding: 10px 5px; }
 
     [data-theme="dark"] .qtd-container { background: rgba(255, 255, 255, 0.05); }
-    
-    button { border: none; padding: 12px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+
+    button {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     button:active { transform: scale(0.95); }
 
-    .lista-items { list-style: none; margin: 25px 0; max-height: 400px; overflow-y: auto; padding-right: 5px; }
-    .lista-items li { background: var(--card-bg); margin-bottom: 18px; padding: 22px; border-radius: 28px; display: flex; flex-direction: column; gap: 15px; border: 1px solid var(--border-color); box-shadow: 0 6px 12px var(--shadow); }
-    
-    .item-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .item-nome { font-weight: 700; font-size: 1.1rem; display: block; }
+    /* LISTA DE ITENS - NOVO LAYOUT */
+    .lista-items {
+      list-style: none;
+      margin: 20px 0;
+      max-height: 450px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .lista-items li {
+      background: var(--card-bg);
+      margin-bottom: 15px;
+      padding: 20px;
+      border-radius: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 10px var(--shadow);
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .item-info { flex: 1; }
+
+    .item-nome { 
+      font-weight: 700; 
+      font-size: 1.1rem; 
+      display: block;
+      margin-bottom: 5px;
+    }
+
     .item-meta { font-size: 0.8rem; color: var(--text-sub); margin-top: 5px; display: flex; align-items: center; gap: 10px; }
-    .item-categoria-tag { background: var(--item-category-bg); padding: 3px 10px; border-radius: 12px; font-weight: 600; }
-    .item-preco { color: #c2410c; font-weight: 800; background: #ffedd5; padding: 8px 15px; border-radius: 15px; font-size: 1rem; min-width: 90px; text-align: center; }
-    
-    .item-actions { display: flex; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; }
-    .btn-check { background: #dcfce7; color: #15803d; flex: 2; justify-content: center; font-size: 0.95rem; }
-    .btn-price { background: #e0f2fe; color: #0369a1; flex: 1; justify-content: center; }
-    .btn-delete { background: #fee2e2; color: #b91c1c; padding: 12px 15px; }
 
-    /* MODAIS */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 3000; }
-    .modal-card { background: var(--container-bg); padding: 30px; border-radius: 35px; width: 90%; max-width: 340px; text-align: center; border: 1px solid var(--border-color); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
-    .modal-card h3 { color: var(--text-main); margin-bottom: 12px; }
-    .modal-card p { color: var(--text-sub); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.4; }
-    .modal-card input { width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 18px; margin-bottom: 20px; text-align: center; font-size: 1.4rem; padding: 12px; color: var(--text-main); }
+    .item-categoria-tag {
+      font-size: 0.7rem;
+      background: var(--item-category-bg);
+      padding: 3px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
 
-    .total-area { background: var(--card-bg); border-radius: 35px; padding: 22px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); margin-top: 15px; }
-    .total-box { font-size: 1.7rem; font-weight: 800; color: #22c55e; }
-    .checked { border-left: 10px solid #22c55e !important; }
+    .item-preco { 
+      font-weight: 800; 
+      background: #22c55e20; 
+      color: #22c55e;
+      padding: 6px 12px; 
+      border-radius: 12px;
+      font-size: 0.9rem;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    .checked { border-left: 8px solid #22c55e !important; }
     .checked .item-nome { text-decoration: line-through; opacity: 0.6; }
+
+    /* Botões de Ação na parte de baixo */
+    .item-actions { 
+      display: flex; 
+      gap: 10px; 
+      justify-content: flex-end;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+    }
+
+    .btn-check { background: #dcfce7; color: #15803d; flex: 1; justify-content: center;}
+    .btn-price { background: #e0f2fe; color: #0369a1; }
+    .btn-delete { background: #fee2e2; color: #b91c1c; }
+
+    /* MODAL PROFISSIONAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-card h3 { margin-bottom: 15px; color: var(--text-main); }
+    .modal-card p { color: var(--text-sub); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.4; }
+
+    .modal-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 15px;
+      padding: 12px;
+      margin-bottom: 20px;
+      color: var(--text-main);
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .modal-buttons { display: flex; gap: 10px; }
+    .modal-buttons button { flex: 1; justify-content: center; }
+
+    /* RODAPÉ */
+    .total-area {
+      background: var(--card-bg);
+      border-radius: 25px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      margin-top: 15px;
+    }
+
+    .total-box { font-size: 1.5rem; font-weight: 800; color: #22c55e; }
   </style>
 </head>
 <body>
 
-<button class="theme-switch" onclick="toggleTheme()" id="themeBtn"><i class="fas fa-moon"></i></button>
+<button class="theme-switch" id="themeBtn"><i class="fas fa-moon"></i></button>
 
 <div id="modalPreco" class="modal-overlay">
     <div class="modal-card">
         <h3 id="modalTitle">Valor do Item</h3>
-        <input type="number" id="modalInput" placeholder="0.00" step="0.01" inputmode="decimal">
-        <div style="display: flex; gap: 12px;">
-            <button onclick="fecharModal('modalPreco')" style="background: #ccc; flex: 1; justify-content: center;">Sair</button>
-            <button onclick="confirmarPreco()" style="background: #22c55e; color: white; flex: 1; justify-content: center;">Salvar</button>
+        <input type="number" id="modalInput" class="modal-input" placeholder="0.00" step="0.01" inputmode="decimal">
+        <div class="modal-buttons">
+            <button id="btnFecharModalPreco" style="background: #ccc;">Sair</button>
+            <button id="btnConfirmarPreco" style="background: #22c55e; color: white;">Salvar</button>
         </div>
     </div>
 </div>
@@ -121,9 +301,9 @@
         <i class="fas fa-exclamation-circle" style="color: #ef4444; font-size: 2.5rem; margin-bottom: 15px;"></i>
         <h3 id="confirmTitle">Atenção</h3>
         <p id="confirmMsg">Deseja realizar esta ação?</p>
-        <div style="display: flex; gap: 12px;">
-            <button onclick="fecharModal('modalConfirm')" style="background: #ccc; flex: 1; justify-content: center;">Não</button>
-            <button onclick="confirmarAcao()" style="background: #ef4444; color: white; flex: 1; justify-content: center;">Sim, Confirmar</button>
+        <div class="modal-buttons">
+            <button id="btnFecharModalConfirm" style="background: #ccc;">Não</button>
+            <button id="btnConfirmarAcao" style="background: #ef4444; color: white;">Sim, Confirmar</button>
         </div>
     </div>
 </div>
@@ -134,13 +314,13 @@
 
   <div class="group-box">
     <input type="text" id="novaLista" placeholder="Nova lista (Ex: Churrasco)..." autocomplete="off">
-    <button onclick="criarLista()" style="background: #2c9e6e; color: white;"><i class="fas fa-plus"></i> Criar</button>
+    <button id="btnCriarLista" style="background: #2c9e6e; color: white;"><i class="fas fa-plus"></i> Criar</button>
   </div>
 
   <div class="group-box" style="background: rgba(59, 130, 246, 0.05);">
     <label style="font-weight: 700; font-size: 0.9rem; padding-left: 5px;">Lista Ativa:</label>
-    <select id="listas" onchange="trocarLista()"></select>
-    <button onclick="abrirConfirmacaoExcluirLista()" style="background: #fee2e2; color: #b91c1c; padding: 10px 12px;" title="Excluir Lista Inteira">
+    <select id="listas"></select>
+    <button id="btnExcluirLista" style="background: #fee2e2; color: #b91c1c; padding: 10px 12px;" title="Excluir Lista Inteira">
       <i class="fas fa-trash-alt"></i>
     </button>
   </div>
@@ -153,14 +333,14 @@
       <input type="number" id="qtd" value="1" min="1" placeholder="Qtd">
     </div>
 
-    <select id="categoria" style="flex: 1.5;">
+    <select id="categoria">
       <option value="Mercado">🛒 Mercado</option>
       <option value="Farmácia">💊 Farmácia</option>
       <option value="Hortifruti">🥑 Hortifruti</option>
       <option value="Limpeza">🧼 Limpeza</option>
       <option value="Outros">✨ Outros</option>
     </select>
-    <button onclick="adicionar()" style="background: #3b82f6; color: white;"><i class="fas fa-cart-plus"></i></button>
+    <button id="btnAdicionar" style="background: #3b82f6; color: white;"><i class="fas fa-cart-plus"></i></button>
   </div>
 
   <ul id="lista" class="lista-items"></ul>
@@ -170,23 +350,31 @@
         <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-sub);">TOTAL PAGO:</span>
         <div class="total-box">R$ <span id="total">0,00</span></div>
     </div>
-    <button onclick="abrirConfirmacaoLimpar()" style="background: #fee2e2; color: #b91c1c; padding: 15px 20px;" title="Limpar Itens da Lista">
+    <button id="btnLimparLista" style="background: #fee2e2; color: #b91c1c; padding: 15px 20px;" title="Limpar Itens da Lista">
       <i class="fas fa-broom"></i>
     </button>
   </div>
 </div>
 
 <script>
+  // ESTADO DA APLICAÇÃO
   let banco = JSON.parse(localStorage.getItem('bancoListas')) || {};
   let listaAtual = localStorage.getItem('listaAtual') || null;
   let tempIndex = null;
-  let acaoConfirmacao = ""; // "limparItens", "removerItem", "excluirLista"
+  let acaoConfirmacao = ""; 
+  let timeoutSalvar = null;
 
+  // 1. MELHORIA: DEBOUNCE NO SALVAMENTO
   function salvar() {
-    localStorage.setItem('bancoListas', JSON.stringify(banco));
-    localStorage.setItem('listaAtual', listaAtual);
+    clearTimeout(timeoutSalvar);
+    timeoutSalvar = setTimeout(() => {
+      localStorage.setItem('bancoListas', JSON.stringify(banco));
+      localStorage.setItem('listaAtual', listaAtual);
+      console.log("Dados salvos no localStorage (Debounced)");
+    }, 500); // Espera 500ms após a última alteração
   }
 
+  // TEMA
   function toggleTheme() {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
@@ -201,6 +389,7 @@
     }
   }
 
+  // UI - SELECT DE LISTAS
   function atualizarSelect() {
     const select = document.getElementById('listas');
     const nomes = Object.keys(banco);
@@ -220,6 +409,7 @@
     salvar();
   }
 
+  // AÇÕES DE LISTA
   function criarLista() {
     const input = document.getElementById('novaLista');
     const nome = input.value.trim();
@@ -228,31 +418,54 @@
     salvar(); atualizarSelect(); atualizar();
   }
 
-  function trocarLista() { listaAtual = document.getElementById('listas').value; salvar(); atualizar(); }
+  function trocarLista() { 
+    listaAtual = document.getElementById('listas').value; 
+    salvar(); 
+    atualizar(); 
+  }
 
   function adicionar() {
     const prodInput = document.getElementById('produto');
     const qtdInput = document.getElementById('qtd');
+    const catInput = document.getElementById('categoria');
     const nome = prodInput.value.trim();
     const qtd = parseInt(qtdInput.value) || 1;
     if (!listaAtual || !nome) return;
-    banco[listaAtual].push({ nome, categoria: document.getElementById('categoria').value, preco: null, qtd: qtd, comprado: false });
-    prodInput.value = ''; qtdInput.value = '1';
+    
+    banco[listaAtual].push({ 
+      nome, 
+      categoria: catInput.value, 
+      qtd: qtd,
+      preco: null, 
+      comprado: false 
+    });
+    
+    prodInput.value = '';
+    qtdInput.value = '1';
     atualizar();
   }
 
+  // 2. MELHORIA: DOCUMENT FRAGMENT NA ATUALIZAÇÃO DA LISTA
   function atualizar() {
     const ul = document.getElementById('lista');
     ul.innerHTML = '';
     let totalGeral = 0;
-    if (!listaAtual || !banco[listaAtual]) { document.getElementById('total').innerText = "0,00"; return; }
+    
+    if (!listaAtual || !banco[listaAtual]) { 
+      document.getElementById('total').innerText = "0,00"; 
+      return; 
+    }
+
+    const fragment = document.createDocumentFragment();
 
     banco[listaAtual].forEach((item, i) => {
       const q = parseInt(item.qtd) || 1;
       const p = parseFloat(item.preco) || 0;
       const subtotal = p * q;
+      
       const li = document.createElement('li');
       if (item.comprado) li.className = 'checked';
+      
       li.innerHTML = `
         <div class="item-header">
           <div class="item-info">
@@ -265,19 +478,27 @@
           <div class="item-preco">R$ ${subtotal.toFixed(2)}</div>
         </div>
         <div class="item-actions">
-          <button class="btn-check" onclick="toggle(${i})"><i class="fas ${item.comprado ? 'fa-undo' : 'fa-check'}"></i> ${item.comprado ? 'Desfazer' : 'No Carrinho'}</button>
-          <button class="btn-price" onclick="abrirModalPreco(${i})"><i class="fas fa-tag"></i></button>
-          <button class="btn-delete" onclick="abrirConfirmacaoRemover(${i})"><i class="fas fa-trash"></i></button>
+          <button class="btn-check" data-action="toggle" data-index="${i}">
+            <i class="fas ${item.comprado ? 'fa-undo' : 'fa-check'}"></i> ${item.comprado ? 'Desfazer' : 'No Carrinho'}
+          </button>
+          <button class="btn-price" data-action="price" data-index="${i}">
+            <i class="fas fa-tag"></i>
+          </button>
+          <button class="btn-delete" data-action="delete" data-index="${i}">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
       `;
-      ul.appendChild(li);
+      fragment.appendChild(li);
       if (item.comprado) totalGeral += subtotal;
     });
+
+    ul.appendChild(fragment);
     document.getElementById('total').innerText = totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     salvar();
   }
 
-  // LOGICA MODAL
+  // MODAIS
   function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 
   function abrirModalPreco(i) {
@@ -333,9 +554,45 @@
     fecharModal('modalConfirm');
   }
 
-  function toggle(i) { banco[listaAtual][i].comprado = !banco[listaAtual][i].comprado; atualizar(); }
+  function toggle(i) { 
+    banco[listaAtual][i].comprado = !banco[listaAtual][i].comprado; 
+    atualizar(); 
+  }
 
-  carregarTema(); atualizarSelect(); atualizar();
+  // 3. MELHORIA: DELEGAÇÃO DE EVENTOS E EVENT LISTENERS DINÂMICOS
+  document.addEventListener('DOMContentLoaded', () => {
+    // Ouvinte único para a lista (Delegação de Eventos)
+    document.getElementById('lista').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      const action = btn.dataset.action;
+      const index = parseInt(btn.dataset.index);
+
+      if (action === 'toggle') toggle(index);
+      if (action === 'price') abrirModalPreco(index);
+      if (action === 'delete') abrirConfirmacaoRemover(index);
+    });
+
+    // Event Listeners para botões fixos
+    document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+    document.getElementById('btnCriarLista').addEventListener('click', criarLista);
+    document.getElementById('btnAdicionar').addEventListener('click', adicionar);
+    document.getElementById('btnExcluirLista').addEventListener('click', abrirConfirmacaoExcluirLista);
+    document.getElementById('btnLimparLista').addEventListener('click', abrirConfirmacaoLimpar);
+    document.getElementById('listas').addEventListener('change', trocarLista);
+    
+    // Botões de Modais
+    document.getElementById('btnFecharModalPreco').addEventListener('click', () => fecharModal('modalPreco'));
+    document.getElementById('btnConfirmarPreco').addEventListener('click', confirmarPreco);
+    document.getElementById('btnFecharModalConfirm').addEventListener('click', () => fecharModal('modalConfirm'));
+    document.getElementById('btnConfirmarAcao').addEventListener('click', confirmarAcao);
+
+    // Inicialização
+    carregarTema(); 
+    atualizarSelect(); 
+    atualizar();
+  });
 </script>
 </body>
 </html>
