@@ -215,70 +215,12 @@
       align-items: center;
     }
 
-    .search-counter {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--orange-light);
-      color: var(--orange);
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-size: 0.85rem;
-      font-weight: 700;
+    .search-hint {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-sub);
     }
-    .search-counter i { font-size: 0.95rem; }
-    .search-counter.all-done { background: var(--green-light); color: var(--green); }
-
-    .search-result {
-      margin-top: 12px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 0.88rem;
-      line-height: 1.6;
-      color: var(--text);
-      display: none;
-    }
-
-    .search-result .result-header {
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .match-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-
-    .match-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-    }
-
-    .match-item .match-name { font-weight: 700; font-size: 0.92rem; }
-    .match-item .match-meta { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
-
-    .match-status {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-    .match-status.pending { background: var(--orange-light); color: var(--orange); }
-    .match-status.done { background: var(--green-light); color: var(--green); }
+    .search-hint.no-match { color: var(--red); }
 
     /* LIST */
     .list-section { padding: 14px 18px; }
@@ -586,17 +528,16 @@
     </div>
   </div>
 
-  <!-- BUSCA NA LISTA -->
+  <!-- BUSCA NA LISTA (filtro local, ao vivo) -->
   <div class="search-section">
     <div class="section-label"><i class="fas fa-magnifying-glass"></i> Pesquisar item na lista</div>
     <div class="search-box">
       <div class="field" style="flex: 1;">
         <i class="fas fa-magnifying-glass field-icon"></i>
-        <input type="text" id="searchQuery" placeholder="Digite o nome do produto..." onkeydown="if(event.key==='Enter') searchItem()">
+        <input type="text" id="searchQuery" placeholder="Digite o nome do produto..." oninput="renderizar()" autocomplete="off">
       </div>
-      <button class="btn btn-blue" onclick="searchItem()" id="searchBtn"><i class="fas fa-search"></i> Buscar</button>
     </div>
-    <div class="search-result" id="searchResult"></div>
+    <div class="search-hint" id="searchHint"></div>
   </div>
 
   <!-- LIST -->
@@ -688,6 +629,10 @@
     const nome = prodInput.value.trim();
     if (!listaAtual || !nome) return;
     const qtd = parseInt(qtdInput.value) || 1;
+    
+    // Garantir que a lista existe no banco antes de dar push
+    if (!banco[listaAtual]) banco[listaAtual] = [];
+    
     banco[listaAtual].push({
       nome,
       categoria: document.getElementById('categoria').value,
@@ -696,25 +641,32 @@
       comprado: false
     });
     prodInput.value = ''; qtdInput.value = '1';
+    
+    // Resetar a pesquisa para que o novo item apareça imediatamente
+    const searchInput = document.getElementById('searchQuery');
+    if (searchInput) searchInput.value = '';
+    
+    salvar();
     renderizar();
   }
 
   function toggle(i) {
     banco[listaAtual][i].comprado = !banco[listaAtual][i].comprado;
+    salvar();
     renderizar();
-    // Se a busca estiver com resultados exibidos, atualiza o contador/resultados
-    const resultDiv = document.getElementById('searchResult');
-    if (resultDiv.style.display === 'block' && resultDiv.dataset.lastQuery) {
-      searchItem(resultDiv.dataset.lastQuery);
-    }
   }
 
-  // ── RENDER ─────────────────────────────────────────────────
+  // ── RENDER (agora com filtro de busca ao vivo) ──────────────
   function renderizar() {
     const container = document.getElementById('listContainer');
+    const searchHint = document.getElementById('searchHint');
+    const searchInput = document.getElementById('searchQuery');
+    const termo = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
     if (!listaAtual || !banco[listaAtual]) {
       container.innerHTML = '<div class="empty-state"><i class="fas fa-cart-plus"></i>Crie uma lista e adicione itens!</div>';
       updateStats(0, 0, 0); document.getElementById('total').innerText = '0,00';
+      if (searchHint) searchHint.textContent = '';
       return;
     }
 
@@ -722,14 +674,45 @@
     if (items.length === 0) {
       container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i>Lista vazia — adicione itens acima!</div>';
       updateStats(0, 0, 0); document.getElementById('total').innerText = '0,00';
-      salvar(); return;
+      if (searchHint) searchHint.textContent = '';
+      return;
     }
 
-    const pending = items.filter(i => !i.comprado);
-    const done = items.filter(i => i.comprado);
+    // Estatísticas e total sempre consideram a lista INTEIRA, não o filtro
+    const pendingAll = items.filter(i => !i.comprado);
+    const doneAll = items.filter(i => i.comprado);
+    let totalPago = 0;
+    doneAll.forEach(item => {
+      const q = parseInt(item.qtd) || 1;
+      const p = parseFloat(item.preco) || 0;
+      totalPago += p * q;
+    });
+    updateStats(pendingAll.length, doneAll.length, items.length);
+    document.getElementById('total').innerText = totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+    // Filtro de busca: se tiver texto, mostra só o(s) item(ns) que batem com o nome.
+    // Se o campo estiver vazio, mostra a lista inteira normalmente.
+    const itemsToShow = termo
+      ? items.filter(i => i.nome.toLowerCase().includes(termo))
+      : items;
+
+    if (searchHint) {
+      if (!termo) {
+        searchHint.textContent = '';
+        searchHint.classList.remove('no-match');
+      } else if (itemsToShow.length === 0) {
+        searchHint.textContent = Nenhum item chamado "${termo}" está cadastrado nesta lista.;
+        searchHint.classList.add('no-match');
+      } else {
+        searchHint.textContent = ${itemsToShow.length} item(ns) encontrado(s) para "${termo}";
+        searchHint.classList.remove('no-match');
+      }
+    }
+
+    const pending = itemsToShow.filter(i => !i.comprado);
+    const done = itemsToShow.filter(i => i.comprado);
 
     let html = '';
-    let totalPago = 0;
 
     if (pending.length > 0) {
       html += <div class="pending-header"><i class="fas fa-clock"></i> Faltam comprar (${pending.length})</div>;
@@ -746,18 +729,16 @@
       html += '<ul class="item-list">';
       done.forEach(item => {
         const idx = items.indexOf(item);
-        const q = parseInt(item.qtd) || 1;
-        const p = parseFloat(item.preco) || 0;
-        totalPago += p * q;
         html += buildItemCard(item, idx, true);
       });
       html += '</ul>';
     }
 
+    if (itemsToShow.length === 0 && termo) {
+      html = <div class="empty-state"><i class="fas fa-magnifying-glass"></i>Nenhum item encontrado para "${termo}".</div>;
+    }
+
     container.innerHTML = html;
-    updateStats(pending.length, done.length, items.length);
-    document.getElementById('total').innerText = totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-    salvar();
   }
 
   function buildItemCard(item, i, isDone) {
@@ -811,7 +792,7 @@
 
   function savePrice() {
     const val = document.getElementById('priceInput').value;
-    if (val !== '') { banco[listaAtual][tempIndex].preco = parseFloat(val); renderizar(); }
+    if (val !== '') { banco[listaAtual][tempIndex].preco = parseFloat(val); salvar(); renderizar(); }
     closeModal('overlayPreco');
   }
 
@@ -852,78 +833,11 @@
       listaAtual = nomes.length > 0 ? nomes[0] : null;
       atualizarSelect();
     }
+    salvar();
     renderizar();
     closeModal('overlayConfirm');
   }
 
-  // ── BUSCA NA LISTA ─────────────────────────────────────────
-  // Pesquisa itens já cadastrados na lista atual (por nome, parcial e sem case-sensitive)
-  // e mostra o contador de quantos itens ainda faltam para fechar a lista.
-  function searchItem(forcedQuery) {
-    const queryInputEl = document.getElementById('searchQuery');
-    const query = (forcedQuery !== undefined ? forcedQuery : queryInputEl.value).trim();
-    const resultDiv = document.getElementById('searchResult');
-
-    if (!listaAtual || !banco[listaAtual]) {
-      resultDiv.style.display = 'block';
-      resultDiv.innerHTML = `<div class="result-header" style="color:var(--red)"><i class="fas fa-exclamation-triangle"></i> Nenhuma lista selecionada</div>
-        <p style="font-size:0.85rem;color:var(--text-sub);">Crie ou selecione uma lista primeiro.</p>`;
-      return;
-    }
-
-    if (!query) return;
-
-    if (forcedQuery === undefined) queryInputEl.value = query;
-    resultDiv.dataset.lastQuery = query;
-
-    const items = banco[listaAtual];
-    const termo = query.toLowerCase();
-    const encontrados = items
-      .map((item, idx) => ({ item, idx }))
-      .filter(({ item }) => item.nome.toLowerCase().includes(termo));
-
-    const pendentesTotal = items.filter(i => !i.comprado).length;
-    const totalItens = items.length;
-
-    // Contador de itens que faltam para fechar a lista
-    const counterClass = pendentesTotal === 0 ? 'search-counter all-done' : 'search-counter';
-    const counterIcon = pendentesTotal === 0 ? 'fa-circle-check' : 'fa-cart-shopping';
-    const counterText = pendentesTotal === 0
-      ? 'Lista completa! Todos os itens já estão no carrinho 🎉'
-      : Faltam <strong>${pendentesTotal}</strong> de ${totalItens} item(ns) para fechar a lista;
-
-    let matchesHtml = '';
-    if (encontrados.length === 0) {
-      matchesHtml = `<p style="font-size:0.85rem;color:var(--text-sub);margin-top:10px;">
-        Nenhum item chamado "<strong>${query}</strong>" está cadastrado nesta lista.
-      </p>`;
-    } else {
-      matchesHtml = <ul class="match-list" style="margin-top:10px;">;
-      encontrados.forEach(({ item, idx }) => {
-        const q = parseInt(item.qtd) || 1;
-        const statusClass = item.comprado ? 'done' : 'pending';
-        const statusText = item.comprado ? 'No carrinho' : 'Falta comprar';
-        matchesHtml += `
-          <li class="match-item">
-            <div>
-              <div class="match-name">${item.nome}</div>
-              <div class="match-meta">${item.categoria} · × ${q}</div>
-            </div>
-            <span class="match-status ${statusClass}">${statusText}</span>
-          </li>`;
-      });
-      matchesHtml += </ul>;
-    }
-
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = `
-      <div class="result-header"><i class="fas fa-search"></i> Resultado da busca</div>
-      <div class="${counterClass}"><i class="fas ${counterIcon}"></i> ${counterText}</div>
-      ${matchesHtml}
-    `;
-  }
-
-  document.getElementById('searchQuery').addEventListener('keydown', e => { if (e.key === 'Enter') searchItem(); });
   document.getElementById('produto').addEventListener('keydown', e => { if (e.key === 'Enter') adicionar(); });
   document.getElementById('novaLista').addEventListener('keydown', e => { if (e.key === 'Enter') criarLista(); });
 
